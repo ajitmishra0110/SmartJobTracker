@@ -1,0 +1,38 @@
+# Secrets — never commit
+.env
+job-tracker-ui/.env
+*.env.local
+
+# Java / Maven
+**/target/
+.mvn/wrapper/maven-wrapper.jar
+!**/src/main/**/target/
+!**/src/test/**/target/
+
+# Node / React
+**/node_modules/
+job-tracker-ui/build/
+
+# IDE
+.idea/
+**/.idea/
+*.iml
+*.iws
+*.ipr
+.classpath
+.project
+.settings/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Logs and temp
+*.log
+.codex/
+.cursor/
+
+# Keep these tracked:
+# .env.example
+# .vscode/
+# .run/

@@ -1,0 +1,20 @@
+services:
+  postgres:
+    image: postgres:16
+    container_name: smartjobtracker-postgres
+    environment:
+      POSTGRES_DB: smartjobtracker
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+    ports:
+      - "5432:5432"
+    volumes:
+      - smartjobtracker_pgdata:/var/lib/postgresql/data
+    healthcheck:
+      test: ["CMD-SHELL", "pg_isready -U postgres -d smartjobtracker"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+
+volumes:
+  smartjobtracker_pgdata:

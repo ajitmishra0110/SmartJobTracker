@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="AI Service" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="ai-service" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.smartjobtracker.ai.AiServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>

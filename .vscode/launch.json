@@ -1,0 +1,52 @@
+{
+  "version": "0.2.0",
+  "configurations": [
+    {
+      "type": "java",
+      "name": "1. Eureka Server (8761)",
+      "request": "launch",
+      "mainClass": "com.smartjobtracker.eureka.EurekaServerApplication",
+      "projectName": "eureka-server"
+    },
+    {
+      "type": "java",
+      "name": "2. Auth Service (8081)",
+      "request": "launch",
+      "mainClass": "com.smartjobtracker.auth.AuthServiceApplication",
+      "projectName": "smartJobTracker",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "3. Job Service (8082)",
+      "request": "launch",
+      "mainClass": "com.smartjobtracker.job.JobServiceApplication",
+      "projectName": "job-service",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "4. AI Service (8083)",
+      "request": "launch",
+      "mainClass": "com.smartjobtracker.ai.AiServiceApplication",
+      "projectName": "ai-service",
+      "envFile": "${workspaceFolder}/.env"
+    },
+    {
+      "type": "java",
+      "name": "5. API Gateway (8080)",
+      "request": "launch",
+      "mainClass": "com.smartjobtracker.apigateway.ApiGatewayApplication",
+      "projectName": "api-gateway"
+    },
+    {
+      "type": "node",
+      "name": "6. React UI (3000)",
+      "request": "launch",
+      "runtimeExecutable": "npm",
+      "runtimeArgs": ["start"],
+      "cwd": "${workspaceFolder}/job-tracker-ui",
+      "console": "integratedTerminal"
+    }
+  ]
+}

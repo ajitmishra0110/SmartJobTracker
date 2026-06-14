@@ -1,0 +1,75 @@
+{
+  "version": "2.0.0",
+  "tasks": [
+    {
+      "label": "Maven: Build All",
+      "type": "shell",
+      "command": ".\\mvnw.cmd",
+      "args": ["clean", "package", "-DskipTests"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "group": {
+        "kind": "build",
+        "isDefault": true
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Maven: Build All (with tests)",
+      "type": "shell",
+      "command": ".\\mvnw.cmd",
+      "args": ["clean", "package"],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Start All Services",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-ExecutionPolicy",
+        "Bypass",
+        "-File",
+        "${workspaceFolder}/start-all.ps1"
+      ],
+      "options": {
+        "cwd": "${workspaceFolder}"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "Free port 8081 (Auth Service)",
+      "type": "shell",
+      "command": "powershell",
+      "args": [
+        "-Command",
+        "$p = (Get-NetTCPConnection -LocalPort 8081 -ErrorAction SilentlyContinue).OwningProcess | Select-Object -Unique; if ($p) { Stop-Process -Id $p -Force; Write-Host \"Stopped PID $p on port 8081\" } else { Write-Host \"Port 8081 is free\" }"
+      ],
+      "problemMatcher": []
+    },
+    {
+      "label": "UI: npm install",
+      "type": "shell",
+      "command": "npm",
+      "args": ["install"],
+      "options": {
+        "cwd": "${workspaceFolder}/job-tracker-ui"
+      },
+      "problemMatcher": []
+    },
+    {
+      "label": "UI: npm start",
+      "type": "shell",
+      "command": "npm",
+      "args": ["start"],
+      "options": {
+        "cwd": "${workspaceFolder}/job-tracker-ui"
+      },
+      "isBackground": true,
+      "problemMatcher": []
+    }
+  ]
+}

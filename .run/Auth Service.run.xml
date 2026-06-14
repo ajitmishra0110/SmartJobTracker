@@ -1,0 +1,9 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Auth Service" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <module name="smartJobTracker" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="com.smartjobtracker.auth.AuthServiceApplication" />
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
