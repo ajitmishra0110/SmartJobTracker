@@ -26,11 +26,24 @@ function Login({ setToken }) {
                 setError("Account created. Log in to open your pipeline.");
             }
         } catch (err) {
-            setError(
-                mode === "login"
-                    ? "Login failed. Check your email and password."
-                    : "Signup failed. Use a valid email and an 8+ character password."
-            );
+            const serverMessage =
+                err.response?.data?.message ||
+                err.response?.data ||
+                (err.response?.status === 409 ? "Email already registered." : null);
+
+            if (serverMessage && typeof serverMessage === "string") {
+                setError(serverMessage);
+            } else if (!err.response) {
+                setError(
+                    "Cannot reach the API. Check REACT_APP_API_URL on Vercel and CORS_ALLOWED_ORIGINS on Render gateway."
+                );
+            } else {
+                setError(
+                    mode === "login"
+                        ? "Login failed. Check your email and password."
+                        : "Signup failed. Use a valid email and an 8+ character password."
+                );
+            }
         } finally {
             setIsSubmitting(false);
         }
