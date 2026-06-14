@@ -70,6 +70,14 @@ Or start Postgres with Docker:
 docker compose up -d postgres
 ```
 
+## Deploy live (free hosting)
+
+See **[DEPLOY.md](DEPLOY.md)** for step-by-step instructions to deploy on **Render** (backend + database) and **Vercel** (React UI).
+
+Quick start:
+1. [Render Blueprint](https://dashboard.render.com/select-repo?type=blueprint) → connect `SmartJobTracker` repo
+2. [Vercel](https://vercel.com/new) → import repo, root dir `job-tracker-ui`, set `REACT_APP_API_URL` to your gateway URL
+
 ## Run locally
 
 Start services in this order:
