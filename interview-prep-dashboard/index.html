@@ -1,0 +1,714 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <title>Interview Prep Dashboard</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.min.js"></script>
+    <style>
+        :root {
+            --bg: #0b1020;
+            --surface: #141b2d;
+            --surface-2: #1c2640;
+            --border: #2a3550;
+            --text: #eef2ff;
+            --muted: #94a3b8;
+            --accent: #6366f1;
+            --accent-soft: rgba(99, 102, 241, 0.15);
+            --success: #10b981;
+            --success-soft: rgba(16, 185, 129, 0.12);
+            --radius: 14px;
+        }
+
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+
+        body {
+            font-family: "Segoe UI", system-ui, sans-serif;
+            background: var(--bg);
+            color: var(--text);
+            min-height: 100vh;
+        }
+
+        .layout {
+            display: grid;
+            grid-template-columns: 300px 1fr;
+            min-height: 100vh;
+        }
+
+        .sidebar {
+            background: var(--surface);
+            border-right: 1px solid var(--border);
+            padding: 1.25rem;
+            display: flex;
+            flex-direction: column;
+            gap: 1rem;
+        }
+
+        .brand .eyebrow {
+            color: var(--accent);
+            font-size: 0.72rem;
+            font-weight: 700;
+            letter-spacing: 0.08em;
+            text-transform: uppercase;
+        }
+
+        .brand h1 { font-size: 1.25rem; margin-top: 0.25rem; }
+
+        .brand p {
+            color: var(--muted);
+            font-size: 0.82rem;
+            margin-top: 0.35rem;
+            line-height: 1.45;
+        }
+
+        .upload-box {
+            border: 1px dashed var(--border);
+            border-radius: var(--radius);
+            padding: 1rem;
+            text-align: center;
+            background: var(--surface-2);
+        }
+
+        .upload-box p {
+            font-size: 0.82rem;
+            color: var(--muted);
+            margin-bottom: 0.75rem;
+        }
+
+        input[type="text"] {
+            width: 100%;
+            background: var(--bg);
+            border: 1px solid var(--border);
+            border-radius: 8px;
+            color: var(--text);
+            padding: 0.55rem 0.7rem;
+            font: inherit;
+            font-size: 0.88rem;
+            margin-bottom: 0.6rem;
+        }
+
+        .btn {
+            background: var(--accent);
+            color: white;
+            border: none;
+            border-radius: 8px;
+            padding: 0.55rem 0.9rem;
+            font: inherit;
+            font-size: 0.85rem;
+            font-weight: 600;
+            cursor: pointer;
+            width: 100%;
+        }
+
+        .btn:hover { filter: brightness(1.08); }
+
+        .btn.secondary {
+            background: var(--surface-2);
+            color: var(--text);
+            border: 1px solid var(--border);
+        }
+
+        .btn.danger {
+            background: transparent;
+            color: #f87171;
+            border: 1px solid #7f1d1d;
+        }
+
+        .file-label {
+            display: block;
+            margin-top: 0.5rem;
+            cursor: pointer;
+        }
+
+        .file-label input { display: none; }
+
+        .prep-list {
+            flex: 1;
+            overflow-y: auto;
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .prep-item {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.75rem;
+            cursor: pointer;
+            transition: border-color 0.15s, background 0.15s;
+        }
+
+        .prep-item:hover { border-color: var(--accent); }
+
+        .prep-item.active {
+            border-color: var(--accent);
+            background: var(--accent-soft);
+        }
+
+        .prep-item h3 {
+            font-size: 0.9rem;
+            margin-bottom: 0.25rem;
+            word-break: break-word;
+        }
+
+        .prep-meta {
+            font-size: 0.75rem;
+            color: var(--muted);
+        }
+
+        .mini-bar {
+            height: 4px;
+            background: var(--border);
+            border-radius: 999px;
+            margin-top: 0.5rem;
+            overflow: hidden;
+        }
+
+        .mini-bar span {
+            display: block;
+            height: 100%;
+            background: var(--success);
+        }
+
+        .sidebar-actions {
+            display: flex;
+            flex-direction: column;
+            gap: 0.45rem;
+        }
+
+        .main {
+            padding: 1.5rem 1.75rem 3rem;
+            overflow-y: auto;
+        }
+
+        .empty-main {
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            min-height: 70vh;
+            color: var(--muted);
+            text-align: center;
+            padding: 2rem;
+        }
+
+        .header-row {
+            display: flex;
+            justify-content: space-between;
+            align-items: flex-start;
+            gap: 1rem;
+            margin-bottom: 1.25rem;
+            flex-wrap: wrap;
+        }
+
+        .header-row h2 { font-size: 1.5rem; }
+
+        .header-row .sub {
+            color: var(--muted);
+            font-size: 0.88rem;
+            margin-top: 0.25rem;
+        }
+
+        .stats {
+            display: flex;
+            gap: 0.75rem;
+            flex-wrap: wrap;
+        }
+
+        .stat {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: 10px;
+            padding: 0.65rem 0.9rem;
+            min-width: 90px;
+        }
+
+        .stat label {
+            display: block;
+            font-size: 0.7rem;
+            color: var(--muted);
+            text-transform: uppercase;
+        }
+
+        .stat strong { font-size: 1.2rem; }
+
+        .filters {
+            display: flex;
+            gap: 0.4rem;
+            margin-bottom: 1rem;
+        }
+
+        .chip {
+            background: var(--surface);
+            border: 1px solid var(--border);
+            color: var(--muted);
+            border-radius: 999px;
+            padding: 0.35rem 0.85rem;
+            font-size: 0.8rem;
+            cursor: pointer;
+        }
+
+        .chip.active {
+            background: var(--accent-soft);
+            color: var(--accent);
+            border-color: var(--accent);
+        }
+
+        .question-list { list-style: none; }
+
+        .question {
+            display: grid;
+            grid-template-columns: auto 1fr auto;
+            gap: 0.85rem;
+            align-items: start;
+            padding: 0.95rem 1rem;
+            background: var(--surface);
+            border: 1px solid var(--border);
+            border-radius: var(--radius);
+            margin-bottom: 0.55rem;
+        }
+
+        .question.done {
+            background: var(--success-soft);
+            border-color: rgba(16, 185, 129, 0.35);
+        }
+
+        .question input[type="checkbox"] {
+            width: 18px;
+            height: 18px;
+            margin-top: 3px;
+            accent-color: var(--success);
+            cursor: pointer;
+        }
+
+        .q-text {
+            font-size: 0.92rem;
+            line-height: 1.5;
+            word-break: break-word;
+        }
+
+        .question.done .q-text {
+            color: var(--muted);
+            text-decoration: line-through;
+        }
+
+        .date-box label {
+            display: block;
+            font-size: 0.68rem;
+            color: var(--muted);
+            text-transform: uppercase;
+            margin-bottom: 0.2rem;
+        }
+
+        .date-box input[type="date"] {
+            background: var(--surface-2);
+            border: 1px solid var(--border);
+            border-radius: 6px;
+            color: var(--text);
+            padding: 0.35rem 0.45rem;
+            font: inherit;
+            font-size: 0.8rem;
+        }
+
+        .date-box input:disabled { opacity: 0.35; }
+
+        .status-msg {
+            font-size: 0.82rem;
+            color: var(--success);
+            min-height: 1.2rem;
+            margin-top: 0.35rem;
+        }
+
+        @media (max-width: 800px) {
+            .layout { grid-template-columns: 1fr; }
+            .sidebar { border-right: none; border-bottom: 1px solid var(--border); }
+        }
+    </style>
+</head>
+<body>
+    <div class="layout">
+        <aside class="sidebar">
+            <div class="brand">
+                <p class="eyebrow">Interview prep</p>
+                <h1>Prep dashboard</h1>
+                <p>Upload a PDF for each prep round. Your progress is saved automatically on this device.</p>
+            </div>
+
+            <div class="upload-box">
+                <input type="text" id="prepName" placeholder="Prep name (e.g. Amazon SDE-2)" />
+                <label class="file-label btn secondary">
+                    Choose PDF
+                    <input type="file" id="pdfInput" accept="application/pdf,.pdf" />
+                </label>
+                <p id="fileName">No file selected</p>
+                <button class="btn" id="createPrepBtn" type="button">Create prep from PDF</button>
+                <p class="status-msg" id="uploadStatus"></p>
+            </div>
+
+            <div class="prep-list" id="prepList"></div>
+
+            <div class="sidebar-actions">
+                <button class="btn secondary" id="exportBtn" type="button">Export all data</button>
+                <label class="file-label btn secondary">
+                    Import backup
+                    <input type="file" id="importInput" accept="application/json,.json" />
+                </label>
+            </div>
+        </aside>
+
+        <main class="main" id="mainPanel">
+            <div class="empty-main" id="emptyMain">
+                <div>
+                    <h2>No prep selected</h2>
+                    <p style="margin-top:0.5rem">Upload a PDF on the left to create your first prep set,<br />or select an existing one to continue.</p>
+                </div>
+            </div>
+
+            <div id="prepView" style="display:none">
+                <div class="header-row">
+                    <div>
+                        <h2 id="viewTitle"></h2>
+                        <p class="sub" id="viewMeta"></p>
+                    </div>
+                    <div class="stats">
+                        <div class="stat"><label>Total</label><strong id="sTotal">0</strong></div>
+                        <div class="stat"><label>Done</label><strong id="sDone">0</strong></div>
+                        <div class="stat"><label>Left</label><strong id="sLeft">0</strong></div>
+                    </div>
+                </div>
+
+                <div class="filters">
+                    <button class="chip active" data-filter="all">All</button>
+                    <button class="chip" data-filter="open">Remaining</button>
+                    <button class="chip" data-filter="done">Completed</button>
+                </div>
+
+                <ul class="question-list" id="questionList"></ul>
+                <button class="btn danger" id="deletePrepBtn" type="button" style="width:auto;margin-top:1rem">Delete this prep</button>
+            </div>
+        </main>
+    </div>
+
+    <script>
+        pdfjsLib.GlobalWorkerOptions.workerSrc =
+            "https://cdnjs.cloudflare.com/ajax/libs/pdf.js/3.11.174/pdf.worker.min.js";
+
+        const STORAGE_KEY = "interviewPrepDashboard_v2";
+        let state = loadState();
+        let activeFilter = "all";
+
+        function loadState() {
+            try {
+                const saved = JSON.parse(localStorage.getItem(STORAGE_KEY));
+                if (saved && Array.isArray(saved.preps)) return saved;
+            } catch (_) {}
+            return { preps: [], activePrepId: null };
+        }
+
+        function saveState() {
+            localStorage.setItem(STORAGE_KEY, JSON.stringify(state));
+        }
+
+        function today() {
+            return new Date().toISOString().slice(0, 10);
+        }
+
+        function formatDate(iso) {
+            if (!iso) return "";
+            return new Date(iso + "T00:00:00").toLocaleDateString(undefined, {
+                year: "numeric", month: "short", day: "numeric",
+            });
+        }
+
+        async function extractTextFromPdf(file) {
+            const buffer = await file.arrayBuffer();
+            const pdf = await pdfjsLib.getDocument({ data: buffer }).promise;
+            let text = "";
+
+            for (let i = 1; i <= pdf.numPages; i++) {
+                const page = await pdf.getPage(i);
+                const content = await page.getTextContent();
+                const pageText = content.items.map((item) => item.str).join(" ");
+                text += pageText + "\n";
+            }
+            return text;
+        }
+
+        function parseQuestionsFromText(text) {
+            const normalized = text
+                .replace(/\r/g, "\n")
+                .replace(/\u2022/g, "\n• ")
+                .replace(/\t/g, " ");
+
+            const chunks = normalized.split(/\n(?=\s*(?:\d+[\.\)]\s|Q\d+[\.\:\)]\s|Question\s+\d+[\.\:\)]\s|•\s|-\s))/gi);
+
+            let candidates = chunks
+                .map((c) => c.replace(/^\s*(?:\d+[\.\)]|Q\d+[\.\:\)]|Question\s+\d+[\.\:\)]|•|-)\s*/i, "").trim())
+                .map((c) => c.replace(/\s+/g, " ").trim())
+                .filter((c) => c.length >= 8);
+
+            if (candidates.length < 2) {
+                candidates = normalized
+                    .split(/\n+/)
+                    .map((l) => l.replace(/^\s*(?:\d+[\.\)]|•|-)\s*/, "").trim())
+                    .filter((l) => l.length >= 8);
+            }
+
+            const seen = new Set();
+            const unique = [];
+            candidates.forEach((q) => {
+                const key = q.toLowerCase();
+                if (!seen.has(key)) {
+                    seen.add(key);
+                    unique.push(q);
+                }
+            });
+            return unique;
+        }
+
+        function getActivePrep() {
+            return state.preps.find((p) => p.id === state.activePrepId) || null;
+        }
+
+        function prepProgress(prep) {
+            const total = prep.questions.length;
+            const done = prep.questions.filter((q) => q.solved).length;
+            return { total, done, left: total - done, pct: total ? Math.round((done / total) * 100) : 0 };
+        }
+
+        function renderSidebar() {
+            const list = document.getElementById("prepList");
+            list.innerHTML = "";
+
+            if (state.preps.length === 0) {
+                list.innerHTML = '<p style="color:var(--muted);font-size:0.82rem">No preps yet.</p>';
+                return;
+            }
+
+            state.preps
+                .slice()
+                .sort((a, b) => new Date(b.createdAt) - new Date(a.createdAt))
+                .forEach((prep) => {
+                    const p = prepProgress(prep);
+                    const el = document.createElement("div");
+                    el.className = "prep-item" + (prep.id === state.activePrepId ? " active" : "");
+                    el.innerHTML =
+                        `<h3>${escapeHtml(prep.name)}</h3>` +
+                        `<div class="prep-meta">${p.done}/${p.total} done · ${formatDate(prep.createdAt.slice(0, 10))}</div>` +
+                        `<div class="mini-bar"><span style="width:${p.pct}%"></span></div>`;
+                    el.addEventListener("click", () => {
+                        state.activePrepId = prep.id;
+                        saveState();
+                        render();
+                    });
+                    list.appendChild(el);
+                });
+        }
+
+        function renderMain() {
+            const prep = getActivePrep();
+            const empty = document.getElementById("emptyMain");
+            const view = document.getElementById("prepView");
+
+            if (!prep) {
+                empty.style.display = "flex";
+                view.style.display = "none";
+                return;
+            }
+
+            empty.style.display = "none";
+            view.style.display = "block";
+
+            const p = prepProgress(prep);
+            document.getElementById("viewTitle").textContent = prep.name;
+            document.getElementById("viewMeta").textContent =
+                `${prep.fileName} · ${prep.questions.length} questions · uploaded ${formatDate(prep.createdAt.slice(0, 10))}`;
+            document.getElementById("sTotal").textContent = p.total;
+            document.getElementById("sDone").textContent = p.done;
+            document.getElementById("sLeft").textContent = p.left;
+
+            const list = document.getElementById("questionList");
+            list.innerHTML = "";
+
+            prep.questions
+                .filter((q) => {
+                    if (activeFilter === "done") return q.solved;
+                    if (activeFilter === "open") return !q.solved;
+                    return true;
+                })
+                .forEach((q, index) => {
+                    const li = document.createElement("li");
+                    li.className = "question" + (q.solved ? " done" : "");
+
+                    const cb = document.createElement("input");
+                    cb.type = "checkbox";
+                    cb.checked = q.solved;
+
+                    const text = document.createElement("div");
+                    text.className = "q-text";
+                    text.textContent = `${index + 1}. ${q.text}`;
+
+                    const dateBox = document.createElement("div");
+                    dateBox.className = "date-box";
+                    dateBox.innerHTML = "<label>Solved on</label>";
+                    const dateInput = document.createElement("input");
+                    dateInput.type = "date";
+                    dateInput.disabled = !q.solved;
+                    dateInput.value = q.solvedDate || today();
+
+                    cb.addEventListener("change", () => {
+                        q.solved = cb.checked;
+                        q.solvedDate = cb.checked ? (dateInput.value || today()) : null;
+                        saveState();
+                        render();
+                    });
+
+                    dateInput.addEventListener("change", () => {
+                        if (q.solved) {
+                            q.solvedDate = dateInput.value || today();
+                            saveState();
+                            renderSidebar();
+                        }
+                    });
+
+                    dateBox.appendChild(dateInput);
+                    li.appendChild(cb);
+                    li.appendChild(text);
+                    li.appendChild(dateBox);
+                    list.appendChild(li);
+                });
+        }
+
+        function render() {
+            renderSidebar();
+            renderMain();
+        }
+
+        function escapeHtml(str) {
+            return str.replace(/[&<>"']/g, (c) =>
+                ({ "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c])
+            );
+        }
+
+        document.getElementById("pdfInput").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            document.getElementById("fileName").textContent = file ? file.name : "No file selected";
+        });
+
+        document.getElementById("createPrepBtn").addEventListener("click", async () => {
+            const nameInput = document.getElementById("prepName");
+            const fileInput = document.getElementById("pdfInput");
+            const status = document.getElementById("uploadStatus");
+            const file = fileInput.files[0];
+            const name = nameInput.value.trim() || (file ? file.name.replace(/\.pdf$/i, "") : "");
+
+            status.textContent = "";
+            if (!file) {
+                status.style.color = "#f87171";
+                status.textContent = "Choose a PDF first.";
+                return;
+            }
+            if (!name) {
+                status.style.color = "#f87171";
+                status.textContent = "Enter a prep name.";
+                return;
+            }
+
+            status.style.color = varMuted();
+            status.textContent = "Reading PDF…";
+
+            try {
+                const text = await extractTextFromPdf(file);
+                const parsed = parseQuestionsFromText(text);
+
+                if (parsed.length === 0) {
+                    status.style.color = "#f87171";
+                    status.textContent = "No questions found. Use numbered lines (1. …) or one question per line.";
+                    return;
+                }
+
+                const prep = {
+                    id: crypto.randomUUID(),
+                    name,
+                    fileName: file.name,
+                    createdAt: new Date().toISOString(),
+                    questions: parsed.map((t) => ({
+                        id: crypto.randomUUID(),
+                        text: t,
+                        solved: false,
+                        solvedDate: null,
+                    })),
+                };
+
+                state.preps.push(prep);
+                state.activePrepId = prep.id;
+                saveState();
+
+                nameInput.value = "";
+                fileInput.value = "";
+                document.getElementById("fileName").textContent = "No file selected";
+                status.style.color = "#10b981";
+                status.textContent = `Added ${parsed.length} questions.`;
+                render();
+            } catch (err) {
+                status.style.color = "#f87171";
+                status.textContent = "Could not read PDF. Try a text-based PDF (not scanned images).";
+                console.error(err);
+            }
+        });
+
+        function varMuted() { return "#94a3b8"; }
+
+        document.querySelectorAll(".chip").forEach((chip) => {
+            chip.addEventListener("click", () => {
+                document.querySelectorAll(".chip").forEach((c) => c.classList.remove("active"));
+                chip.classList.add("active");
+                activeFilter = chip.dataset.filter;
+                renderMain();
+            });
+        });
+
+        document.getElementById("deletePrepBtn").addEventListener("click", () => {
+            const prep = getActivePrep();
+            if (!prep) return;
+            if (!confirm(`Delete "${prep.name}" and all its progress?`)) return;
+            state.preps = state.preps.filter((p) => p.id !== prep.id);
+            state.activePrepId = state.preps[0]?.id || null;
+            saveState();
+            render();
+        });
+
+        document.getElementById("exportBtn").addEventListener("click", () => {
+            const blob = new Blob([JSON.stringify(state, null, 2)], { type: "application/json" });
+            const url = URL.createObjectURL(blob);
+            const a = document.createElement("a");
+            a.href = url;
+            a.download = "interview-prep-backup.json";
+            a.click();
+            URL.revokeObjectURL(url);
+        });
+
+        document.getElementById("importInput").addEventListener("change", (e) => {
+            const file = e.target.files[0];
+            if (!file) return;
+            const reader = new FileReader();
+            reader.onload = (ev) => {
+                try {
+                    const imported = JSON.parse(ev.target.result);
+                    if (!imported.preps || !Array.isArray(imported.preps)) throw new Error("invalid");
+                    state = imported;
+                    saveState();
+                    render();
+                    alert("Backup restored.");
+                } catch {
+                    alert("Invalid backup file.");
+                }
+                e.target.value = "";
+            };
+            reader.readAsText(file);
+        });
+
+        render();
+    </script>
+</body>
+</html>

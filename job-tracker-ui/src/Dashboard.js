@@ -1,6 +1,7 @@
 import React, { useEffect, useMemo, useState } from "react";
 import API from "./api";
 import AiModal from "./AiModal";
+import PrepPanel from "./PrepPanel";
 import "./App.css";
 
 const statusOptions = ["Saved", "Applied", "Interview", "Offer", "Rejected"];
@@ -147,6 +148,7 @@ function Dashboard({ setToken }) {
     const [selectedStatus, setSelectedStatus] = useState("All");
     const [viewMode, setViewMode] = useState("board");
     const [isIntakeOpen, setIsIntakeOpen] = useState(true);
+    const [activeTab, setActiveTab] = useState("pipeline");
 
     useEffect(() => {
         localStorage.setItem("resumeSummary", resumeSummary);
@@ -544,19 +546,41 @@ function Dashboard({ setToken }) {
                     </div>
                 </div>
                 <div className="topbar-actions">
-                    <button
-                        className="ai-button"
-                        disabled={aiLoading || jobs.length === 0}
-                        onClick={handlePipelineInsights}
-                    >
-                        Analyze pipeline
-                    </button>
+                    <div className="main-nav">
+                        <button
+                            className={activeTab === "pipeline" ? "active" : ""}
+                            onClick={() => setActiveTab("pipeline")}
+                            type="button"
+                        >
+                            Pipeline
+                        </button>
+                        <button
+                            className={activeTab === "prep" ? "active" : ""}
+                            onClick={() => setActiveTab("prep")}
+                            type="button"
+                        >
+                            Interview prep
+                        </button>
+                    </div>
+                    {activeTab === "pipeline" && (
+                        <button
+                            className="ai-button"
+                            disabled={aiLoading || jobs.length === 0}
+                            onClick={handlePipelineInsights}
+                        >
+                            Analyze pipeline
+                        </button>
+                    )}
                     <button className="secondary-button" onClick={handleLogout}>
                         Logout
                     </button>
                 </div>
             </header>
 
+            {activeTab === "prep" ? (
+                <PrepPanel />
+            ) : (
+                <>
             <section className="command-center">
                 <div className="briefing-panel">
                     <div>
@@ -932,6 +956,8 @@ function Dashboard({ setToken }) {
                     onClose={closeAiModal}
                     result={aiResult}
                 />
+            )}
+                </>
             )}
         </main>
     );
