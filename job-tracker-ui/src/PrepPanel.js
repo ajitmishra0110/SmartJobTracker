@@ -51,23 +51,34 @@ function PrepPanel() {
         });
     }, [activePrep, filter]);
 
-    const loadPrepSets = async () => {
-        try {
-            setError("");
-            const res = await API.get("/jobs/prep-sets");
-            setPrepSets(res.data);
-            if (res.data.length > 0 && !activePrepId) {
-                setActivePrepId(res.data[0].id);
-            }
-        } catch (err) {
-            setError("Could not load interview prep sets. Make sure job-service is running.");
-        } finally {
-            setLoading(false);
-        }
-    };
-
     useEffect(() => {
+        let cancelled = false;
+
+        async function loadPrepSets() {
+            try {
+                setError("");
+                const res = await API.get("/jobs/prep-sets");
+                if (cancelled) return;
+                setPrepSets(res.data);
+                if (res.data.length > 0) {
+                    setActivePrepId((current) => current ?? res.data[0].id);
+                }
+            } catch (err) {
+                if (!cancelled) {
+                    setError("Could not load interview prep sets. Make sure job-service is running.");
+                }
+            } finally {
+                if (!cancelled) {
+                    setLoading(false);
+                }
+            }
+        }
+
         loadPrepSets();
+
+        return () => {
+            cancelled = true;
+        };
     }, []);
 
     const handleCreateFromPdf = async (event) => {
