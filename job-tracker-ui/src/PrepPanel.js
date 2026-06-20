@@ -115,11 +115,25 @@ function PrepPanel() {
             setSelectedFile(null);
             setStatus(`Added ${questions.length} questions to "${name}".`);
         } catch (err) {
+            if (!err.response) {
+                setError(
+                    err.message?.includes("worker") || err.message?.includes("PDF")
+                        ? `Could not read PDF: ${err.message}`
+                        : err.message ||
+                              "Could not read the PDF. Use a text-based PDF (not a scanned image)."
+                );
+                return;
+            }
+
+            const data = err.response.data;
             const message =
-                err.response?.data?.message ||
-                err.response?.data ||
-                "Could not create prep set. Use a text-based PDF.";
-            setError(typeof message === "string" ? message : "Could not create prep set.");
+                (typeof data === "string" && data.trim()) ||
+                data?.message ||
+                (data?.error && err.response.status
+                    ? `${data.error} (${err.response.status})`
+                    : null) ||
+                "Could not save prep set. Make sure job-service is deployed on Render.";
+            setError(typeof message === "string" ? message : "Could not save prep set.");
         } finally {
             setUploading(false);
         }
